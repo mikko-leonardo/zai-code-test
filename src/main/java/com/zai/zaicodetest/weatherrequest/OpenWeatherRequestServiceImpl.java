@@ -1,26 +1,32 @@
 package com.zai.zaicodetest.weatherrequest;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 class OpenWeatherRequestServiceImpl implements WeatherRequestService
 {
+    @Value("${openweather.apiKey}")
+    private String apiKey;
+
+    @Value("${openweather.apiUrl}")
+    private String apiUrl;
 
     @Override
-    public void sendWeatherReportRequest(String city, String unit)
+    public String sendWeatherReportRequest(String city, String unit)
     {
-
+        return "";
     }
 
     @Override
-    public void buildRequestUrl(String city, String unit)
+    public String buildRequestUrl(String city, String unit)
     {
-
+        return "";
     }
 
     @Override
-    public void mapResponseToReport(String response)
+    public String mapResponseToReport(String response)
     {
-
+        return "";
     }
 }

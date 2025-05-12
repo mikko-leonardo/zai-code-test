@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -24,11 +25,17 @@ class WeatherStackRequestServiceImplTest {
     @InjectMocks
     private WeatherStackRequestServiceImpl weatherStackRequestService;
 
+    @Value("${weatherstack.apiKey}")
+    private String apiKey;
+
+    @Value("${weatherstack.apiUrl}")
+    private String apiUrl;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        ReflectionTestUtils.setField(weatherStackRequestService, "apiKey", "764520a89a55aad3e308cae83b3491af");
-        ReflectionTestUtils.setField(weatherStackRequestService, "apiUrl", "api.weatherstack.com");
+        ReflectionTestUtils.setField(weatherStackRequestService, "apiKey", apiKey);
+        ReflectionTestUtils.setField(weatherStackRequestService, "apiUrl", apiUrl);
     }
 
     @Test
@@ -36,7 +43,7 @@ class WeatherStackRequestServiceImplTest {
         String url = weatherStackRequestService.buildRequestUrl("melbourne", "metric");
         assertTrue(url.contains("units=m"));
         assertTrue(url.contains("query=melbourne"));
-        assertTrue(url.contains("access_key=764520a89a55aad3e308cae83b3491af"));
+        assertTrue(url.contains("access_key=" + apiKey));
     }
 
     @Test

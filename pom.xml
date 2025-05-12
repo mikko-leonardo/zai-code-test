@@ -11,7 +11,7 @@
     <groupId>com.zai</groupId>
     <artifactId>zai-code-test</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <name>zai-code-test</name>
     <description>zai-code-test</description>
     <url/>

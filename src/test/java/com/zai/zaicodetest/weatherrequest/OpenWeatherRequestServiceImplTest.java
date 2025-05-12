@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -24,11 +25,17 @@ class OpenWeatherRequestServiceImplTest {
     @InjectMocks
     private OpenWeatherRequestServiceImpl openWeatherRequestService;
 
+    @Value("${openweathermap.apiKey}")
+    private String apiKey;
+
+    @Value("${openweathermap.apiUrl}")
+    private String apiUrl;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        ReflectionTestUtils.setField(openWeatherRequestService, "apiKey", "2326504fb9b100bee21400190e4dbe6d");
-        ReflectionTestUtils.setField(openWeatherRequestService, "apiUrl", "api.openweathermap.org");
+        ReflectionTestUtils.setField(openWeatherRequestService, "apiKey", apiKey);
+        ReflectionTestUtils.setField(openWeatherRequestService, "apiUrl", apiUrl);
     }
 
     @Test
@@ -36,7 +43,7 @@ class OpenWeatherRequestServiceImplTest {
         String url = openWeatherRequestService.buildRequestUrl("melbourne", "metric");
         assertTrue(url.contains("units=metric"));
         assertTrue(url.contains("q=melbourne"));
-        assertTrue(url.contains("appid=2326504fb9b100bee21400190e4dbe6d"));
+        assertTrue(url.contains("appid=" + apiKey));
         assertTrue(url.startsWith("https://"));
     }
 

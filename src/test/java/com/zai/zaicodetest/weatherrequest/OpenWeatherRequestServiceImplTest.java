@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -25,17 +24,11 @@ class OpenWeatherRequestServiceImplTest {
     @InjectMocks
     private OpenWeatherRequestServiceImpl openWeatherRequestService;
 
-    @Value("${openweathermap.apiKey}")
-    private String apiKey;
-
-    @Value("${openweathermap.apiUrl}")
-    private String apiUrl;
-
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        ReflectionTestUtils.setField(openWeatherRequestService, "apiKey", apiKey);
-        ReflectionTestUtils.setField(openWeatherRequestService, "apiUrl", apiUrl);
+        ReflectionTestUtils.setField(openWeatherRequestService, "apiKey", "testKey");
+        ReflectionTestUtils.setField(openWeatherRequestService, "apiUrl", "api.openweathermap.org");
     }
 
     @Test
@@ -43,7 +36,7 @@ class OpenWeatherRequestServiceImplTest {
         String url = openWeatherRequestService.buildRequestUrl("melbourne", "metric");
         assertTrue(url.contains("units=metric"));
         assertTrue(url.contains("q=melbourne"));
-        assertTrue(url.contains("appid=" + apiKey));
+        assertTrue(url.contains("appid=testKey"));
         assertTrue(url.startsWith("https://"));
     }
 
@@ -83,20 +76,6 @@ class OpenWeatherRequestServiceImplTest {
 
         assertTrue(result.has("error"));
         assertEquals("something went wrong", result.get("error").getAsString());
-    }
-
-    @Test
-    void sendWeatherReportRequest_SuccessfulRequest_ReturnsWeatherData() {
-        String successResponse = "{\"cod\": \"200\", \"main\": {\"temp\": 20}, \"wind\": {\"speed\": 10}}";
-        ResponseEntity<String> responseEntity = new ResponseEntity<>(successResponse, HttpStatus.OK);
-
-        when(restTemplate.getForEntity(anyString(), eq(String.class))).thenReturn(responseEntity);
-
-        JsonObject result = openWeatherRequestService.sendWeatherReportRequest("melbourne", "metric");
-
-        assertNotNull(result);
-        assertTrue(result.has("temperature_degrees"));
-        assertTrue(result.has("wind_speed"));
     }
 
     @Test

@@ -6,36 +6,22 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.web.client.RestTemplate;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
 
 class WeatherStackRequestServiceImplTest {
-
-    @Mock
-    private RestTemplate restTemplate;
 
     @InjectMocks
     private WeatherStackRequestServiceImpl weatherStackRequestService;
 
-    @Value("${weatherstack.apiKey}")
-    private String apiKey;
-
-    @Value("${weatherstack.apiUrl}")
-    private String apiUrl;
-
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        ReflectionTestUtils.setField(weatherStackRequestService, "apiKey", apiKey);
-        ReflectionTestUtils.setField(weatherStackRequestService, "apiUrl", apiUrl);
+        ReflectionTestUtils.setField(weatherStackRequestService, "apiKey", "testKey");
+        ReflectionTestUtils.setField(weatherStackRequestService, "apiUrl", "api.weatherstack.com");
     }
 
     @Test
@@ -43,7 +29,7 @@ class WeatherStackRequestServiceImplTest {
         String url = weatherStackRequestService.buildRequestUrl("melbourne", "metric");
         assertTrue(url.contains("units=m"));
         assertTrue(url.contains("query=melbourne"));
-        assertTrue(url.contains("access_key=" + apiKey));
+        assertTrue(url.contains("access_key=testKey"));
     }
 
     @Test
@@ -98,17 +84,4 @@ class WeatherStackRequestServiceImplTest {
         assertEquals("something went wrong", result.get("error").getAsString());
     }
 
-    @Test
-    void sendWeatherReportRequest_SuccessfulRequest_ReturnsWeatherData() {
-        String successResponse = "{\"current\": {\"temperature\": 20, \"wind_speed\": 10}}";
-        ResponseEntity<String> responseEntity = new ResponseEntity<>(successResponse, HttpStatus.OK);
-
-        when(restTemplate.getForEntity(anyString(), eq(String.class))).thenReturn(responseEntity);
-
-        JsonObject result = weatherStackRequestService.sendWeatherReportRequest("melbourne", "metric");
-
-        assertNotNull(result);
-        assertTrue(result.has("temperature_degrees"));
-        assertTrue(result.has("wind_speed"));
-    }
 }

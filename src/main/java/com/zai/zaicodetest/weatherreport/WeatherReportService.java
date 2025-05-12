@@ -24,11 +24,8 @@ class WeatherReportService {
         //Check if there is a cached report that is still valid
         WeatherReport cachedReport = weatherReportCache.get("cachedReport");
         if (cachedReport != null && cachedReport.getTimestamp() > System.currentTimeMillis() - 1000 * 3) {
-            System.out.println("Using cached report");
             return cachedReport.getReport().toString();
         }
-
-        System.out.println("Getting new report");
 
         //If there's no cached report or it's not valid, try to get a new one using WeatherStack API
         JsonObject jsonReport = weatherStackRequestServiceImpl.sendWeatherReportRequest(city, unit);
@@ -56,7 +53,10 @@ class WeatherReportService {
     }
 
     private Boolean isReportValid(JsonObject report) {
-        return report.has("wind_speed") && report.has("temperature_degrees");
+        if (report != null) {
+            return report.has("wind_speed") && report.has("temperature_degrees");
+        }
+        return false;
     }
 
 }

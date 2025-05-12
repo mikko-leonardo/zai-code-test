@@ -6,6 +6,7 @@ import com.google.gson.JsonSyntaxException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -24,14 +25,17 @@ class OpenWeatherRequestServiceImpl implements WeatherRequestService
     {
         String uri = buildRequestUrl(city, unit);
 
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.getForEntity(uri, String.class);
-        if (!isResponseValid(response)) {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<String> response = restTemplate.getForEntity(uri, String.class);
+
+            return mapResponseToReport(response.getBody());
+
+        } catch (HttpClientErrorException e) {
             JsonObject error = new JsonObject();
             error.addProperty("error", "something went wrong");
             return error;
         }
-        return mapResponseToReport(response.getBody());
     }
 
     @Override
@@ -55,6 +59,11 @@ class OpenWeatherRequestServiceImpl implements WeatherRequestService
         try {
             JsonObject wind = JsonParser.parseString(response).getAsJsonObject().getAsJsonObject("wind");
             JsonObject main = JsonParser.parseString(response).getAsJsonObject().getAsJsonObject("main");
+            if (wind == null || main == null) {
+                JsonObject error = new JsonObject();
+                error.addProperty("error", "something went wrong");
+                return error;
+            }
             report.add("wind_speed", wind.get("speed"));
             report.add("temperature_degrees", main.get("temp"));
         } catch (JsonSyntaxException e) {
@@ -74,7 +83,7 @@ class OpenWeatherRequestServiceImpl implements WeatherRequestService
 
         String statusCode = JsonParser.parseString(response.getBody()).
                 getAsJsonObject()
-                .getAsJsonObject("cod")
+                .get("cod")
                 .getAsString();
 
         if (!statusCode.equals("200")) {

@@ -27,7 +27,7 @@ class OpenWeatherRequestServiceImplTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        ReflectionTestUtils.setField(openWeatherRequestService, "apiKey", "testKey");
+        ReflectionTestUtils.setField(openWeatherRequestService, "apiKey", "2326504fb9b100bee21400190e4dbe6d");
         ReflectionTestUtils.setField(openWeatherRequestService, "apiUrl", "api.openweathermap.org");
     }
 
@@ -36,7 +36,7 @@ class OpenWeatherRequestServiceImplTest {
         String url = openWeatherRequestService.buildRequestUrl("melbourne", "metric");
         assertTrue(url.contains("units=metric"));
         assertTrue(url.contains("q=melbourne"));
-        assertTrue(url.contains("appid=testKey"));
+        assertTrue(url.contains("appid=2326504fb9b100bee21400190e4dbe6d"));
         assertTrue(url.startsWith("https://"));
     }
 
@@ -76,6 +76,20 @@ class OpenWeatherRequestServiceImplTest {
 
         assertTrue(result.has("error"));
         assertEquals("something went wrong", result.get("error").getAsString());
+    }
+
+    @Test
+    void sendWeatherReportRequest_SuccessfulRequest_ReturnsWeatherData() {
+        String successResponse = "{\"cod\": \"200\", \"main\": {\"temp\": 20}, \"wind\": {\"speed\": 10}}";
+        ResponseEntity<String> responseEntity = new ResponseEntity<>(successResponse, HttpStatus.OK);
+
+        when(restTemplate.getForEntity(anyString(), eq(String.class))).thenReturn(responseEntity);
+
+        JsonObject result = openWeatherRequestService.sendWeatherReportRequest("melbourne", "metric");
+
+        assertNotNull(result);
+        assertTrue(result.has("temperature_degrees"));
+        assertTrue(result.has("wind_speed"));
     }
 
     @Test

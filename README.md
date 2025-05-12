@@ -34,7 +34,7 @@ A Spring Boot application that provides weather information through a REST API, 
 
   - if there is no city parameter in the request, it will still return melbourne data.
 
-## Things I Would have done differently
+## Things I Would Have Done Differently
 - keys, url, and other configurations would have been handled via environment variables
 - configurable cache properties
 - refreshAfterWrite cache approach instead of "brute forcing" cache implementation

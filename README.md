@@ -12,8 +12,6 @@ A Spring Boot application that provides weather information through a REST API, 
 - Maven 3.6 or higher
 - API keys for OpenWeather and WeatherStack
 
-    - For ease of demonstration, API keys are provided.
-
 ## Technologies
 
 - Spring Boot 3.4.5

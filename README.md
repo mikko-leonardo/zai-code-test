@@ -37,6 +37,7 @@ A Spring Boot application that provides weather information through a REST API, 
 ## Things I Would have done differently
 - keys, url, and other configurations would have been handled via environment variables
 - configurable cache properties
+- refreshAfterWrite cache approach instead of "brute forcing" cache implementation
 - better error responses and exception handling
 - better logging
 - Swagger/OpenAPI documentation

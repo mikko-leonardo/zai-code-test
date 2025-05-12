@@ -20,16 +20,17 @@ class WeatherStackRequestServiceImpl implements WeatherRequestService
     private String apiUrl;
 
     @Override
-    public String sendWeatherReportRequest(String city, String unit)
+    public JsonObject sendWeatherReportRequest(String city, String unit)
     {
         String uri = buildRequestUrl(city, unit);
 
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response = restTemplate.getForEntity(uri, String.class);
 
-        if(response.getStatusCode().isError() || response.getBody() == null)
-        {
-            return "Weather Stack API request failed";
+        if (!isResponseValid(response)) {
+            JsonObject error = new JsonObject();
+            error.addProperty("error", "something went wrong");
+            return error;
         }
 
         return mapResponseToReport(response.getBody());
@@ -60,7 +61,7 @@ class WeatherStackRequestServiceImpl implements WeatherRequestService
     }
 
     @Override
-    public String mapResponseToReport(String response)
+    public JsonObject mapResponseToReport(String response)
     {
         JsonObject report = new JsonObject();
         try {
@@ -69,9 +70,25 @@ class WeatherStackRequestServiceImpl implements WeatherRequestService
             report.add("temperature_degrees", current.get("temperature"));
         } catch (JsonSyntaxException e) {
             e.printStackTrace();
-            return "Weather Stack API request failed";
+            JsonObject error = new JsonObject();
+            error.addProperty("error", "something went wrong");
+            return error;
         }
 
-        return report.toString();
+        return report;
+    }
+
+    @Override
+    public Boolean isResponseValid(ResponseEntity<String> response) {
+
+        if (response.getStatusCode().isError() || response.getBody() == null) {
+            return false;
+        }
+
+        if (response.getBody().contains("error")) {
+            return false;
+        }
+
+        return true;
     }
 }

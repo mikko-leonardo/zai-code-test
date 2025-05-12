@@ -1,8 +1,12 @@
 package com.zai.zaicodetest.weatherrequest;
 
+import com.google.gson.JsonObject;
+import org.springframework.http.ResponseEntity;
+
 public interface WeatherRequestService
 {
-    String sendWeatherReportRequest(String city, String unit);
+    JsonObject sendWeatherReportRequest(String city, String unit);
     String buildRequestUrl(String city, String unit);
-    String mapResponseToReport(String response);
+    JsonObject mapResponseToReport(String response);
+    Boolean isResponseValid(ResponseEntity<String> response);
 }
